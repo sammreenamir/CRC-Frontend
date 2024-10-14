@@ -17,7 +17,15 @@ jobs:
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-        # new code added 
-    - name: Deploy to Azure Storage 
+
+    - name: Deploy to Azure Storage
       run: |
-        az storage blob upload-batch -d '$web' -s './Frontend' --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --auth-mode login
+        set +e  # Allow script to continue on error
+        echo "Attempting to deploy using Key 1..."
+        az storage blob upload-batch -d '$web' -s './Frontend' --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY_1 }} --auth-mode key
+        if [ $? -ne 0 ]; then
+          echo "Key 1 failed, attempting to deploy using Key 2..."
+          az storage blob upload-batch -d '$web' -s './Frontend' --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY_2 }} --auth-mode key
+        else
+          echo "Deployment succeeded with Key 1."
+        fi
