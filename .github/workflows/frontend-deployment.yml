@@ -17,7 +17,7 @@ jobs:
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-    - name: Deploy to Azure Storage
+        # new code added 
+    - name: Deploy to Azure Storage 
       run: |
         az storage blob upload-batch -d '$web' -s './Frontend' --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} --auth-mode login
